@@ -3,7 +3,7 @@
 ## Dependencies
 
 ```shell
-pip=install requests
+pip install requests
 pip install jsons
 ```  
 ## To Start

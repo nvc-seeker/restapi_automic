@@ -1,2 +1,4 @@
 jsons==1.6.1
 typish==1.9.3
+
+requests~=2.27.1
