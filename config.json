@@ -1,0 +1,19 @@
+{
+  "api_endpoint": "http://localhost:3030/pushTestData",
+  "auth": {
+    "user": "user",
+    "pass": "pass"
+  },
+  "api_params": {
+    "project_id": "project_0001",
+    "device_key": "device_00001"
+  },
+  "first_data_files": ["D:\\WORKING\\NVC_PJ\\restapi_automic\\dataKH.json"],
+  "schedule":{
+    "limitation": 5,
+    "duration": 2,
+    "push_by_limitation": true,
+    "data_files": [["D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP.json", "D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP.json"],
+    "D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP2.json"]
+  }
+}
