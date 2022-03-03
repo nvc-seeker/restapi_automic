@@ -1,7 +1,7 @@
 # restapi_automic
 Post json data to a endpoint    
 
-## Dependencies
+## Installation
 
 ```shell
 pip install -r requirements.txt
