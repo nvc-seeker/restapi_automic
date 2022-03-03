@@ -1,4 +1,5 @@
 # restapi_automic
+Post json data to a endpoint    
 
 ## Dependencies
 
