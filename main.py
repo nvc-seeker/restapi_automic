@@ -9,6 +9,9 @@ import time
 from requests.auth import HTTPDigestAuth
 from datetime import datetime
 
+if not os.path.exists("./logs"):
+    os.makedirs("./logs")
+
 now = datetime.now()
 
 logger = logging.getLogger()
