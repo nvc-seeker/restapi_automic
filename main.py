@@ -118,7 +118,6 @@ def run_app():
 
     data_files = config['data_files']
     schedule = config['schedule']
-    url = api['endpoint']
     payload = api['payload']
 
     logger.info('Run schedule')
