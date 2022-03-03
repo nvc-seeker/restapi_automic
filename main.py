@@ -1,10 +1,26 @@
 import os
 import sys
+import logging
 import json
 import requests
 import time
 
 from requests.auth import HTTPDigestAuth
+from datetime import datetime
+
+now = datetime.now()
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.DEBUG)
+stdout_handler.setFormatter(formatter)
+file_handler = logging.FileHandler("./{name}.log".format(name=now.strftime("%Y%m%d%H%M%S")))
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.addHandler(stdout_handler)
 
 
 def load_json(file_path):
@@ -37,7 +53,7 @@ def push_data(url, auth, data):
     else:
         rs = requests.post(url, data=json.dumps(data), headers=headers)
     rs_time = rs.elapsed.total_seconds()
-    print("post {size}byte in {time}s ".format(size=size, time=rs_time))
+    logger.info("Push {size}byte in {time}s ".format(size=size, time=rs_time))
 
 
 def create_data(payload, file_paths):
@@ -61,12 +77,13 @@ def run_app():
         if "auth" in config["auth"]:
             auth = config["auth"]
 
+        logger.info("Endpoint: " + url)
         data = create_data(payload, data_files)
         if data is not None:
             push_data(url, auth, data)
 
         if 'schedule' in config:
-            print("run schedule")
+            logger.info("Run schedule")
             limitation = config["schedule"]["limitation"]
             duration = config["schedule"]["duration"]
             data_files = config["schedule"]["data_files"]
