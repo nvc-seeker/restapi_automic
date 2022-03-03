@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import json
+import csv
 import requests
 import time
 
@@ -23,7 +24,24 @@ logger.addHandler(file_handler)
 logger.addHandler(stdout_handler)
 
 
-def load_json(file_path):
+def read_csv(file_path, delimiter):
+    with open(file_path, encoding="utf8") as f:
+        data_arr = []
+        if delimiter is None:
+            csv_reader = csv.DictReader(f)
+        else:
+            csv_reader = csv.DictReader(f, delimiter=delimiter)
+
+        for rows in csv_reader:
+            data = {}
+            for key in rows.keys():
+                data[key] = rows[key]
+            data_arr.append(data)
+
+        return data_arr
+
+
+def read_json(file_path):
     with open(file_path, encoding="utf8") as f:
         return json.load(f)
 
@@ -40,9 +58,8 @@ def remake_payload(payload, data):
                 else:
                     new_payload[key] = payload[key]
         return new_payload
-    else:
-        if "${data_files}" == payload:
-            return data
+    elif "${data_files}" == payload:
+        return data
 
 
 def push_data(url, auth, data):
@@ -56,29 +73,36 @@ def push_data(url, auth, data):
     logger.info("Push {size}byte in {time}s ".format(size=size, time=rs_time))
 
 
-def create_data(payload, file_paths):
+def create_data(payload, csv_delimiter, file_paths):
     if isinstance(file_paths, list):
         data_arr = []
         for file_path in file_paths:
-            data_arr.append(load_json(file_path))
+            extension = os.path.splitext(file_path)[1][1:]
+            if "csv" == extension:
+                data_arr.append(read_csv(file_path, csv_delimiter))
+            elif "json":
+                data_arr.append(read_json(file_path))
         return remake_payload(payload, data_arr)
     else:
-        return remake_payload(payload, load_json(file_paths))
+        return remake_payload(payload, read_json(file_paths))
 
 
 def run_app():
-    config = load_json(os.path.abspath(".") + "/config.json")
+    config = read_json(os.path.abspath(".") + "/config.json")
     if config is not None:
         url = config["api_endpoint"]
         # api_params = config["api_params"]
         payload = config["api_payload"]
         data_files = config["first_data_files"]
+        csv_delimiter = None
+        if "csv_delimiter" in config:
+            csv_delimiter = config["csv_delimiter"]
         auth = None
         if "auth" in config["auth"]:
             auth = config["auth"]
 
         logger.info("Endpoint: " + url)
-        data = create_data(payload, data_files)
+        data = create_data(payload, csv_delimiter, data_files)
         if data is not None:
             push_data(url, auth, data)
 
@@ -89,12 +113,12 @@ def run_app():
             data_files = config["schedule"]["data_files"]
 
             file_index = -1
-            while True:
+            while len(data_files) > 0:
                 file_index += 1
                 if file_index >= len(data_files):
                     file_index = 0
 
-                data = create_data(payload, data_files[file_index])
+                data = create_data(payload, csv_delimiter, data_files[file_index])
                 if data is not None:
                     push_data(url, auth, data)
 
