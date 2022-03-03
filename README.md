@@ -3,10 +3,10 @@
 ## Dependencies
 
 ```shell
-pip install requests
-pip install jsons
+pip install -r requirements.txt
 ```  
-## To Start
+
+## Run
 Edit config.json
 
-Run main.py
+python main.py

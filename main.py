@@ -12,64 +12,74 @@ def load_json(file_path):
         return json.load(f)
 
 
-def push_data(url, auth, api_params, file_path):
-    data = load_json(file_path)
-    if data is not None:
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        size = sys.getsizeof(json.dumps(data))
+def remake_payload(payload, data):
+    if isinstance(payload, dict):
+        new_payload = {}
+        for key in payload.keys():
+            if "${data_files}" == payload[key]:
+                new_payload[key] = data
+            else:
+                if isinstance(payload[key], dict):
+                    new_payload[key] = remake_payload(payload[key], data)
+                else:
+                    new_payload[key] = payload[key]
+        return new_payload
+    else:
+        if "${data_files}" == payload:
+            return data
 
-        new_data = {}
-        for key in api_params.keys():
-            new_data[key] = api_params[key]
-        new_data["data"] = data
 
-        if auth is not None:
-            rs = requests.post(url, data=json.dumps(new_data), headers=headers, auth=HTTPDigestAuth(auth['user'], auth['pass']))
-        else:
-            rs = requests.post(url, data=json.dumps(new_data), headers=headers)
-        rs_time = rs.elapsed.total_seconds()
-        print("post {size}byte in {time}s ".format(size=size, time=rs_time))
+def push_data(url, auth, data):
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    size = sys.getsizeof(json.dumps(data))
+    if auth is not None:
+        rs = requests.post(url, data=json.dumps(data), headers=headers, auth=HTTPDigestAuth(auth['user'], auth['pass']))
+    else:
+        rs = requests.post(url, data=json.dumps(data), headers=headers)
+    rs_time = rs.elapsed.total_seconds()
+    print("post {size}byte in {time}s ".format(size=size, time=rs_time))
+
+
+def create_data(payload, file_paths):
+    if isinstance(file_paths, list):
+        data_arr = []
+        for file_path in file_paths:
+            data_arr.append(load_json(file_path))
+        return remake_payload(payload, data_arr)
+    else:
+        return remake_payload(payload, load_json(file_paths))
 
 
 def run_app():
     config = load_json(os.path.abspath(".") + "/config.json")
     if config is not None:
         url = config["api_endpoint"]
-        api_params = config["api_params"]
+        # api_params = config["api_params"]
+        payload = config["api_payload"]
         data_files = config["first_data_files"]
         auth = None
         if "auth" in config["auth"]:
             auth = config["auth"]
 
-        for file_path in data_files:
-            push_data(url, auth, api_params, file_path)
+        data = create_data(payload, data_files)
+        if data is not None:
+            push_data(url, auth, data)
 
         if 'schedule' in config:
             print("run schedule")
             limitation = config["schedule"]["limitation"]
             duration = config["schedule"]["duration"]
             data_files = config["schedule"]["data_files"]
-            is_push_by_limitation = config["schedule"]["push_by_limitation"]
 
-            file_index = 0
+            file_index = -1
             while True:
-                if is_push_by_limitation:
-                    if file_index >= len(data_files):
-                        file_index = 0
+                file_index += 1
+                if file_index >= len(data_files):
+                    file_index = 0
 
-                for i, data_file in enumerate(data_files):
-                    if is_push_by_limitation and i != file_index:
-                        continue
-
-                    if isinstance(data_file, list):
-                        for file_path in data_file:
-                            push_data(url, auth, api_params, file_path)
-                    else:
-                        push_data(url, auth, api_params, data_file)
-
-                    if is_push_by_limitation:
-                        file_index += 1
-                        break
+                data = create_data(payload, data_files[file_index])
+                if data is not None:
+                    push_data(url, auth, data)
 
                 if limitation != -1 and limitation > 1:
                     limitation -= 1

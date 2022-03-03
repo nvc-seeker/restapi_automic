@@ -4,16 +4,18 @@
     "user": "user",
     "pass": "pass"
   },
-  "api_params": {
-    "project_id": "project_0001",
-    "device_key": "device_00001"
+  "api_payload": {
+    "key1": "key1",
+    "key2": "key2",
+    "key3": {
+      "key3_sub": "key3_sub"
+    },
+    "data": "${data_files}"
   },
-  "first_data_files": ["D:\\WORKING\\NVC_PJ\\restapi_automic\\dataKH.json"],
+  "first_data_files": ["./dataKH.json"],
   "schedule":{
     "limitation": 5,
     "duration": 2,
-    "push_by_limitation": true,
-    "data_files": [["D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP.json", "D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP.json"],
-    "D:\\WORKING\\NVC_PJ\\restapi_automic\\dataSP2.json"]
+    "data_files": [["./dataSP.json", "./dataSP2.json"]]
   }
 }
