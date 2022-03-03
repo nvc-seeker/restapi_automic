@@ -5,6 +5,7 @@ import json
 import csv
 import requests
 import time
+import traceback
 
 from requests.auth import HTTPDigestAuth
 from datetime import datetime
@@ -136,4 +137,8 @@ def run_app():
 
 
 if __name__ == '__main__':
-    run_app()
+    try:
+        run_app()
+    except Exception as e:
+        logger.exception(e)
+
