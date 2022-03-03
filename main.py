@@ -121,7 +121,6 @@ def run_app():
     url = api['endpoint']
     payload = api['payload']
 
-    logger.info('Endpoint: ' + url)
     logger.info('Run schedule')
 
     limitation = schedule['limitation']
