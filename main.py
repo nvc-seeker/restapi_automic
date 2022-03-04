@@ -67,28 +67,30 @@ def remake_payload(payload, data):
 
 def push_data(api, data):
     url = api['endpoint']
+    headers = api['headers']
     request_method = api['request_method']
     auth = None
     if 'auth' in api:
         auth = HTTPDigestAuth(api['auth']['user'], api['auth']['pass'])
 
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-
-    size = sys.getsizeof(json.dumps(data))
+    # data_to_send = data
+    data_to_send = json.dumps(data)
+    size = sys.getsizeof(data_to_send)
 
     rs = None
     if 'post' == request_method:
-        rs = requests.post(url, data=json.dumps(data), headers=headers, auth=auth)
+        rs = requests.post(url, data=data_to_send, headers=headers, auth=auth)
     elif 'put' == request_method:
-        rs = requests.put(url, data=json.dumps(data), headers=headers, auth=auth)
+        rs = requests.put(url, data=data_to_send, headers=headers, auth=auth)
     elif 'patch' == request_method:
-        rs = requests.patch(url, data=json.dumps(data), headers=headers, auth=auth)
+        rs = requests.patch(url, data=data_to_send, headers=headers, auth=auth)
     elif 'delete' == request_method:
-        rs = requests.delete(url, data=json.dumps(data), headers=headers, auth=auth)
+        rs = requests.delete(url, data=data_to_send, headers=headers, auth=auth)
 
     if rs is not None:
         rs_time = rs.elapsed.total_seconds()
-        logger.info('Push {size}byte in {time}s '.format(size=size, time=rs_time))
+        status = rs.status_code
+        logger.info('Status_code {status} - Push {size}byte in {time}s '.format(status=status, size=size, time=rs_time))
 
 
 def create_data(payload, csv_delimiter, file_paths):
