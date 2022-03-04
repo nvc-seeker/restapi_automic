@@ -1,6 +1,10 @@
 {
   "api": {
     "endpoint": "http://localhost:3030/pushTestData",
+    "headers": {
+      "Content-type": "application/json",
+      "Accept": "*/*"
+    },
     "auth": {
       "user": "user",
       "pass": "pass"
