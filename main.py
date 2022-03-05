@@ -112,8 +112,8 @@ def validate_config(config):
     assert request_method == 'post' or request_method == 'put' or request_method == 'patch' or request_method == 'delete'
 
 
-def run_app():
-    config = read_json(os.path.abspath('.') + '/config.json')
+def run_app(config_file):
+    config = read_json(config_file)
     validate_config(config)
     api = config['api']
     logger.info('Api: \n' + json.dumps(api, indent=4, separators=('. ', ' = ')))
@@ -149,7 +149,8 @@ def run_app():
 
 
 if __name__ == '__main__':
-    try:
-        run_app()
-    except Exception as e:
-        logger.exception(e)
+    if len(sys.argv) == 2:
+        try:
+            run_app(print(os.path.abspath(sys.argv[1])))
+        except Exception as e:
+            logger.exception(e)
