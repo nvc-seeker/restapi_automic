@@ -24,7 +24,7 @@
       "csv_delimiter": ","
   },
   "schedule":{
-    "limitation": 5,
+    "period": 5,
     "duration": 2
   }
 }

@@ -124,7 +124,7 @@ def run_app():
 
     logger.info('Run schedule')
 
-    limitation = schedule['limitation']
+    period = schedule['period']
     duration = schedule['duration']
     data_files = data_files['files']
     csv_delimiter = None
@@ -141,8 +141,8 @@ def run_app():
         if data is not None:
             push_data(api, data)
 
-        if limitation != -1 and limitation > 1:
-            limitation -= 1
+        if period != -1 and period > 1:
+            period -= 1
             time.sleep(duration)
         else:
             break
