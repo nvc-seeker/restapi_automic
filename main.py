@@ -74,18 +74,17 @@ def push_data(api, data):
         auth = HTTPDigestAuth(api['auth']['user'], api['auth']['pass'])
 
     # data_to_send = data
-    data_to_send = json.dumps(data)
-    size = sys.getsizeof(data_to_send)
+    size = sys.getsizeof(json.dumps(data))
 
     rs = None
     if 'post' == request_method:
-        rs = requests.post(url, data=data_to_send, headers=headers, auth=auth)
+        rs = requests.post(url, json=data, headers=headers, auth=auth)
     elif 'put' == request_method:
-        rs = requests.put(url, data=data_to_send, headers=headers, auth=auth)
+        rs = requests.put(url, json=data, headers=headers, auth=auth)
     elif 'patch' == request_method:
-        rs = requests.patch(url, data=data_to_send, headers=headers, auth=auth)
+        rs = requests.patch(url, json=data, headers=headers, auth=auth)
     elif 'delete' == request_method:
-        rs = requests.delete(url, data=data_to_send, headers=headers, auth=auth)
+        rs = requests.delete(url, json=data, headers=headers, auth=auth)
 
     if rs is not None:
         rs_time = rs.elapsed.total_seconds()
