@@ -151,6 +151,6 @@ def run_app(config_file):
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         try:
-            run_app(print(os.path.abspath(sys.argv[1])))
+            run_app(os.path.abspath(sys.argv[1]))
         except Exception as e:
             logger.exception(e)
