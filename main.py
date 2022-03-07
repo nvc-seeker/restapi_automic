@@ -125,10 +125,21 @@ def run_app(config_file):
 
     period = schedule['period']
     duration = schedule['duration']
-    data_files = data_files['files']
     csv_delimiter = None
     if 'csv_delimiter' in config:
         csv_delimiter = data_files['csv_delimiter']
+
+    if 'files' in data_files:
+        data_files = data_files['files']
+    elif 'folder' in data_files:
+        folder = data_files['folder']
+        data_files = []
+        for r, d, f in os.walk(folder):
+            for file in f:
+                data_files.append(os.path.join(r, file))
+    else:
+        logger.info('No files setting to request')
+        return
 
     file_index = -1
     while len(data_files) > 0:
